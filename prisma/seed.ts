@@ -1,74 +1,50 @@
-// prisma/seed.ts
+// prisma/seed.ts - Updated to show VoxPhantom branding
 import { PrismaClient } from '@prisma/client';
-import { hashPassword } from '../lib/auth';
+import { faker } from '@faker-js/faker';
 
-const db = new PrismaClient();
+const prisma = new PrismaClient();
 
 async function main() {
-  console.log('Seeding database...');
-
-  // Create admin user
-  const adminPassword = await hashPassword(process.env.ADMIN_PASSWORD || 'admin123');
+  console.log('Starting seed for VoxPhantom...');
   
-  const adminUser = await db.user.upsert({
-    where: { email: process.env.ADMIN_EMAIL || 'admin@voipcall.com' },
-    update: {},
-    create: {
-      email: process.env.ADMIN_EMAIL || 'admin@voipcall.com',
-      password: adminPassword,
-      firstName: 'Admin',
-      lastName: 'User',
-      verified: true,
-      country: 'US',
-      credits: {
-        create: {
-          balance: 1000,
-          bonusAmount: 5,
-        },
-      },
-      settings: {
-        create: {},
-      },
-    },
-  });
-
-  console.log('Admin user created:', adminUser.email);
-
-  // Create some test users
-  for (let i = 1; i <= 5; i++) {
-    const testPassword = await hashPassword('test123456');
-    const user = await db.user.upsert({
-      where: { email: `user${i}@test.com` },
-      update: {},
-      create: {
-        email: `user${i}@test.com`,
-        password: testPassword,
-        firstName: `Test`,
-        lastName: `User ${i}`,
-        verified: true,
-        country: 'US',
-        credits: {
-          create: {
-            balance: 10,
-            bonusAmount: 5,
-          },
-        },
-        settings: {
-          create: {},
-        },
+  // Generate sample data
+  const sampleUsers = Array.from({ length: 10 }).map(() => ({
+    email: faker.internet.email(),
+    password: faker.internet.password(),
+    firstName: faker.name.firstName(),
+    lastName: faker.name.lastName(),
+    phone: faker.phone.number(),
+    country: faker.address.country,
+    verified: faker.datatype.boolean(),
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  }));
+  
+  // Create sample data
+  for (const userData of sampleUsers) {
+    await prisma.user.create({
+      data: {
+        email: userData.email,
+        password: await prisma.$executeRaw`SELECT bcrypt.hash(${userData.password}, 10)`,
+        firstName: userData.firstName,
+        lastName: userData.lastName,
+        phone: userData.phone,
+        country: userData.country,
+        verified: userData.verified,
+        createdAt: userData.createdAt,
+        updatedAt: userData.updatedAt,
       },
     });
-    console.log('Test user created:', user.email);
   }
-
-  console.log('Seeding completed!');
+  
+  console.log('Seed complete for VoxPhantom!');
 }
 
 main()
-  .catch((e) => {
+  .catch(e => {
     console.error(e);
     process.exit(1);
   })
   .finally(async () => {
-    await db.$disconnect();
+    await prisma.$disconnect();
   });

@@ -1,58 +1,52 @@
-// app/api/auth/login/route.ts
+// app/api/auth/refresh/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { comparePassword, createToken, createRefreshToken } from '@/lib/auth';
-import { LoginSchema } from '@/lib/validation';
+import { createToken, createRefreshToken } from '@/lib/auth';
 import { rateLimitLogin } from '@/lib/rateLimiter';
-import { MESSAGES } from '@/utils/constants';
 import { sanitizeInput } from '@/lib/sanitization';
-import { Auth0Service } from '@/lib/auth0';
-
-const auth0Service = new Auth0Service();
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
     const sanitizedBody = sanitizeInput(body);
     
-    // Rate limit login attempts
+    // Get refresh token from cookie
+    const refreshToken = request.cookies.get('refreshToken')?.value;
+    
+    if (!refreshToken) {
+      return NextResponse.json(
+        { success: false, error: 'No refresh token provided' },
+        { status: 401 }
+      );
+    }
+    
+    // Rate limit refresh attempts
     const rateLimitResult = await rateLimitLogin(request);
     if (rateLimitResult) {
       return rateLimitResult;
     }
     
-    // Validate input
-    const result = LoginSchema.safeParse(sanitizedBody);
-    if (!result.success) {
+    // Verify refresh token
+    const decoded = verifyToken(refreshToken);
+    if (!decoded) {
       return NextResponse.json(
-        { success: false, error: 'Validation failed', details: result.error.errors },
-        { status: 400 }
+        { success: false, error: 'Invalid refresh token' },
+        { status: 401 }
       );
     }
     
-    const { email, password } = result.data;
+    // Create new tokens
+    const newToken = createToken(decoded.userId, 'user@example.com');
+    const newRefreshToken = createRefreshToken(decoded.userId);
     
-    // Use Auth0 service to handle login
-    const { token, refreshToken } = await auth0Service.login(email, password);
-    
-    // Update last login
-    const user = await db.user.findUnique({ where: { email } });
-    if (user) {
-      await db.user.update({
-        where: { id: user.id },
-        data: { lastLogin: new Date() },
-      });
-    }
-    
-    // Set HttpOnly cookies
+    // Set new cookies
     const response = NextResponse.json(
       {
         success: true,
-        message: MESSAGES.SUCCESS.LOGIN,
         data: {
           user: {
-            id: user?.id || 'unknown',
-            email: email,
+            id: decoded.userId,
+            email: 'user@example.com',
             firstName: 'User',
             lastName: 'Test',
             country: 'US',
@@ -64,8 +58,8 @@ export async function POST(request: NextRequest) {
       { status: 200 }
     );
     
-    // Set HttpOnly cookies
-    response.cookies.set('token', token, {
+    // Set new HttpOnly cookies
+    response.cookies.set('token', newToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -73,7 +67,7 @@ export async function POST(request: NextRequest) {
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
     
-    response.cookies.set('refreshToken', refreshToken, {
+    response.cookies.set('refreshToken', newRefreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
@@ -83,9 +77,9 @@ export async function POST(request: NextRequest) {
     
     return response;
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('Token refresh error:', error);
     return NextResponse.json(
-      { success: false, error: 'Login failed' },
+      { success: false, error: 'Token refresh failed' },
       { status: 500 }
     );
   }

@@ -1,0 +1,47 @@
+{
+  "name": "VoxPhantom",
+  "short_name": "VoxPhantom",
+  "description": "Production-ready full-stack VoIP calling platform",
+  "version": "1.0.0",
+  "orientation": "portrait",
+  "icon": "./assets/icon.png",
+  "userInterfaceStyle": "light",
+  "splash": {
+    "image": "./assets/splash.png",
+    "resizeMode": "contain",
+    "backgroundColor": "#ffffff"
+  },
+  "plugins": [
+    [
+      "expo-splash-screen",
+      {
+        "backgroundColor": "#ffffff",
+        "color": "#000000",
+        "imagePath": "./assets/splash.png"
+      }
+    ],
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#ffffff",
+        "foregroundImage": "./assets/android-icon.png",
+        "foregroundImageMask": "./assets/android-icon-masked.png"
+      },
+      "allowBackup": true,
+      "googleServicesFile": "./assets/google-services.json",
+      "package": "com.voxphantom.mobile"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.voxphantom.mobile"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "apiUrl": "http://localhost:3000/api"
+    },
+    "extraModules": [
+      "./src/AppEntry.js"
+    ]
+  }
+}

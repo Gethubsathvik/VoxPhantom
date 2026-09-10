@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" href="/favicon.ico" />
+    <link rel="manifest" href="/manifest.json" />
+    <link rel="stylesheet" href="/styles.css" />
+    <meta name="theme-color" content="#000000" />
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to use this application.</noscript>
+    <div id="root"></div>
+    <script type="module" src="/_next/static/chunks/index-*.js"></script>
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').then((registration) => {
+            console.log('SW registered: ', registration);
+          }).catch((error) => {
+            console.log('SW registration failed: ', error);
+          });
+        });
+      }
+    </script>
+  </body>
+</html>

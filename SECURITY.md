@@ -1,164 +1,128 @@
-// SECURITY.md
-# Security Policy
+# VoxPhantom Security Policies
 
-## Overview
+## 🔒 Security Features
 
-VoIPCall takes security seriously. This document outlines our security practices and policies.
+### ✅ HTTPS/TLS Encryption
+- All traffic is encrypted using TLS 1.3
+- HTTPS enforced with HSTS (HTTP Strict Transport Security)
+- Certificate management through trusted providers
 
-## Reporting Security Vulnerabilities
+### 🔐 Authentication & Authorization
+- ✅ JWT-based authentication system
+- ✅ HttpOnly cookies for token storage (prevents XSS)
+- ✅ Refresh token rotation (30-day expiry)
+- ✅ Session timeout management
+- ✅ Role-based access control (admin/user)
 
-If you discover a security vulnerability, please email security@voipcall.com instead of using the issue tracker.
+### 🛡️ Input Validation & Sanitization
+- ✅ All user inputs are validated and sanitized
+- ✅ XSS protection through comprehensive sanitization
+- ✅ SQL injection prevention via Prisma ORM
+- ✅ Input validation using Zod schemas
+- ✅ Server-side sanitization middleware
 
-**Please include:**
-- Description of the vulnerability
-- Steps to reproduce
-- Potential impact
-- Suggested fix (if any)
+### 🛡️ Authentication Security
+- ✅ Rate limiting on login attempts (5/15min)
+- ✅ Account lockout after 5 failed attempts
+- ✅ Brute force protection
+- ✅ Secure password storage with bcrypt (salt rounds: 10)
+- ✅ Password complexity requirements:
+  - Minimum 8 characters
+  - At least one uppercase letter
+  - At least one lowercase letter
+  - At least one number
+  - Optional: special characters
 
-We will acknowledge receipt within 48 hours and work on a fix.
+### 🛡️ Network Security
+- ✅ HTTPS/TLS 1.3 encryption
+- ✅ Security headers:
+  - X-Content-Type-Options: nosniff
+  - X-Frame-Options: DENY
+  - X-XSS-Protection: 1; mode=block
+  - Referrer-Policy: no-referrer-when-downgrade
+  - Content-Security-Policy
+  - Strict-Transport-Security
+- ✅ CORS protection
+- ✅ Rate limiting for API endpoints
 
-## Security Measures
+### 🛡️ Data Protection
+- ✅ HTTPS/TLS encryption for all communications
+- ✅ Password hashing with bcrypt
+- ✅ Sensitive data never logged
+- ✅ Tokens never logged
+- ✅ Secure cookie flags (HttpOnly, Secure, SameSite)
+- ✅ Data minimization principles
 
-### Authentication & Authorization
-- ✅ JWT tokens with 7-day expiration
-- ✅ Refresh token rotation
-- ✅ Secure password hashing (bcrypt)
-- ✅ OAuth 2.0 integration
-- ✅ Device fingerprinting
-- ✅ Session management
-- ✅ Multi-device support
+## 🛡️ Security Best Practices
 
-### Data Protection
-- ✅ HTTPS/TLS encryption in transit
-- ✅ Database encryption at rest
-- ✅ Sensitive data masking
-- ✅ PII protection
-- ✅ Secure file uploads
-- ✅ Data retention policies
+1. **Never log sensitive information** (passwords, tokens, PII)
+2. **Never commit secrets** to version control
+3. **Use environment variables** for secrets
+4. **Regular security audits** - Quarterly reviews recommended
+5. **Keep dependencies updated** - Regular npm audit
+6. **Monitor logs** for suspicious activity
+7. **Implement proper error handling** - Don't expose stack traces
 
-### API Security
-- ✅ Rate limiting (100 req/min default)
-- ✅ Request validation
-- ✅ Input sanitization
-- ✅ Output encoding
-- ✅ CORS policy enforcement
-- ✅ CSRF protection
+## 🛡️ Security Best Practices
 
-### Infrastructure
-- ✅ HTTPS only
-- ✅ Security headers (CSP, X-Frame-Options, etc.)
-- ✅ DDoS protection (Cloudflare)
-- ✅ Firewall rules
-- ✅ VPC isolation
-- ✅ Regular backups
+1. **Never store passwords in plain text**
+2. **Always use HTTPS** - Never allow HTTP traffic
+3. **Use HttpOnly cookies** for authentication tokens
+4. **Validate all user inputs** - never trust client-side validation
+5. **Sanitize all server inputs** before processing
+6. **Use parameterized queries** - Prisma handles this automatically
+7. **Regular security audits** - Quarterly reviews recommended
+- ✅ Regular security audits and penetration testing
+- ✅ Monitoring for suspicious activity
+- ✅ Incident response plan in place
+- ✅ Regular security training for team members
 
-### Code Security
-- ✅ Regular dependency updates
-- ✅ Security linting
-- ✅ Code review process
-- ✅ Vulnerability scanning
-- ✅ Penetration testing
-- ✅ Security training
+## 🔐 Authentication Flow
 
-## Compliance
+1. User submits credentials
+2. Password is hashed with bcrypt (salt rounds: 10)
+3. User record is updated with hashed password
+4. JWT token is created and signed
+5. Token is sent in HttpOnly cookie
+6. Subsequent requests include token in Authorization header
+7. Middleware verifies token and attaches user to request
+8. Route handlers use `withAuth` wrapper for protection
 
-- GDPR compliant
-- CCPA compliant
-- SOC 2 ready
-- OWASP Top 10 protection
+## 🔐 Authentication Flow
 
-## Security Headers
+1. User submits credentials to `/api/auth/login`
+2. Server validates credentials
+3. Password is compared with stored bcrypt hash
+4. JWT token is created and signed
+5. Token is sent in HttpOnly cookie
+6. Client stores token in memory (not localStorage)
+7. Subsequent requests include token in Authorization header
+8. Middleware verifies token and attaches user to request
+9. API routes use `withAuth` wrapper for protection
+
+## 🔐 Authentication Flow Diagram
 
 ```
-X-Content-Type-Options: nosniff
-X-Frame-Options: SAMEORIGIN
-X-XSS-Protection: 1; mode=block
-Referrer-Policy: strict-origin-when-cross-origin
-Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline'
-Strict-Transport-Security: max-age=63072000; includeSubDomains
-```
-
-## Best Practices for Users
-
-1. **Use Strong Passwords**
-   - At least 12 characters
-   - Mix of uppercase, lowercase, numbers, symbols
-
-2. **Enable 2FA**
-   - Two-factor authentication
-   - Authenticator apps (Google Authenticator, Authy)
-
-3. **Secure Devices**
-   - Keep OS updated
-   - Use antivirus software
-   - Avoid public WiFi
-
-4. **Account Management**
-   - Review active sessions regularly
-   - Remove untrusted devices
-   - Update email and phone regularly
-
-5. **Report Issues**
-   - Report suspicious activity
-   - Never share security codes
-   - Use official app only
-
-## Incident Response
-
-### Detection
-- Automated alerts
-- Log monitoring
-- Anomaly detection
-
-### Response
-- Immediate isolation
-- Stakeholder notification
-- Forensic investigation
-- Fix and verification
-
-### Communication
-- Transparent updates
-- Timely notifications
-- Remediation steps
-
-## Penetration Testing
-
-We conduct regular security audits and penetration tests. Third-party security firms test our systems quarterly.
-
-## Bug Bounty Program
-
-We offer rewards for discovered vulnerabilities:
-- Critical: $5,000
-- High: $1,000
-- Medium: $500
-- Low: $100
-
-## Version Support
-
-| Version | Release | End of Life |
-|---------|---------|-------------|
-| 1.0     | 2024-05 | 2025-05     |
-| 1.x     | TBD     | TBD         |
-
-Only the latest version receives security updates.
-
-## Dependencies
-
-We use:
-- **bcryptjs** - Password hashing
-- **jsonwebtoken** - Token management
-- **prisma** - Database ORM
-- **next-auth** - Authentication
-- **helmet** - Security headers
-
-All dependencies are regularly updated and scanned for vulnerabilities.
-
-## Changelog Security Updates
-
-Security updates are marked with [SECURITY] in the changelog.
-
-## Contact
-
-- Email: security@voipcall.com
-- Security Team: security-team@voipcall.com
-- Website: https://voipcall.com/security
+User Login
+    ↓
+POST /api/auth/login
+    ↓
+Validate credentials
+    ↓
+Hash password (bcrypt)
+    ↓
+Create JWT token
+    ↓
+Set HttpOnly cookie
+    ↓
+Return success response
+    ↓
+Client stores token (not in localStorage)
+    ↓
+Subsequent requests include Authorization header
+    ↓
+Middleware verifies token
+    ↓
+Attach user to request
+    ↓
+Execute API route handler

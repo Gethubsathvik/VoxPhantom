@@ -1,266 +1,120 @@
-// ARCHITECTURE.md
-# VoIPCall Architecture
+# VoxPhantom Architecture
 
-## System Overview
+VoxPhantom is a **production-ready, full-stack VoIP calling platform** designed for scalability, security, and ease of use. The system follows modern best practices and is structured for maintainability and growth.
 
-VoIPCall is a modern, scalable full-stack application built with Next.js, React, WebRTC, and Twilio.
+## 🏗️ System Architecture
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                         Client (Browser)                     │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │  Next.js / React                                       │  │
-│  │  - Landing Page                                        │  │
-│  │  - Authentication                                      │  │
-│  │  - Dashboard                                           │  │
-│  │  - Call Interface                                      │  │
-│  │  - Admin Panel                                         │  │
-│  └────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-                          │
-                          │ HTTPS
-                          │
-┌─────────────────────────────────────────────────────────────┐
-│                    CDN (Cloudflare)                          │
-│  - Static file caching                                      │
-│  - DDoS protection                                          │
-│  - Edge locations worldwide                                │
-└─────────────────────────────────────────────────────────────┘
-                          │
-                          │
-┌─────────────────────────────────────────────────────────────┐
-│              Backend (Next.js API Routes)                    │
-│  ┌────────────────────────────────────────────────────────┐  │
-│  │ /api/auth        - Authentication & Sessions           │  │
-│  │ /api/calls       - Call management                      │  │
-│  │ /api/credits     - Credit system                        │  │
-│  │ /api/admin       - Admin operations                     │  │
-│  │ /api/twilio      - Twilio webhooks                      │  │
-│  └────────────────────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────────────────┘
-         │                    │                    │
-         │                    │                    │
-    PostgreSQL            Redis              Twilio
-    ┌─────────┐          ┌─────┐         ┌──────────────┐
-    │ Database│          │Cache│         │ Voice API    │
-    │ - Users │          │     │         │ - Calls      │
-    │ - Calls │          └─────┘         │ - SMS        │
-    │ - Creds │                          └──────────────┘
-    │ - Trans │
-    └─────────┘
-```
+### 🏗️ Layered Architecture
+1. **Presentation Layer** - Next.js 15 (React 19)
+2. **API Layer** - Next.js API Routes
+3. **Database Layer** - PostgreSQL with Prisma ORM
+4. **Infrastructure Layer** - Docker, Redis, and external services
 
-## Core Modules
+### 🏗️ Key Components
 
-### Authentication Module
-- JWT token generation and validation
-- Password hashing with bcrypt
-- Session management
-- OAuth integration (Google)
-- Device fingerprinting
+#### 1. **Frontend (Next.js)**
+- File-based routing with App Router
+- Server Components for optimal performance
+- Server Actions for data mutations
+- Server Components for data fetching
+- Server Components for server-side rendering
 
-### Call Management Module
-- Call initiation and termination
-- Real-time status updates
-- Duration tracking
-- Recording support
-- Quality monitoring
+#### Key Files:
+- `app/page.tsx` - Root layout and landing page
+- `app/page.tsx` - Landing page component
+- `app/layout.tsx` - Root layout with authentication wrapper
+- `app/api/` - API route handlers
+- `components/` - Reusable UI components
+- `hooks/` - Custom React hooks for state management
 
-### Credit System Module
-- Balance management
-- Transaction tracking
-- Daily bonus distribution
-- Rate limiting
-- Fraud detection
+#### Backend (API Routes)
+- File-based routing in `app/api/`
+- API route handlers in `/api/` directory
+- Authentication routes in `/api/auth/`
+- Call management routes in `/api/calls/`
+- Credit management in `/api/credits/`
 
-### Admin Module
-- User management
-- Analytics dashboard
-- Abuse monitoring
-- Report management
-- System health monitoring
+### 🗄️ Database Schema (Prisma)
 
-## Data Flow
+The database schema includes 13 core models:
 
-### Call Initiation Flow
-```
-User Input → Validation → Credit Check → Create Call Record
-    ↓
-Twilio API Call → WebRTC Connection → Real-time Updates
-    ↓
-Call Recording → Duration Tracking → Credit Deduction
-    ↓
-Transaction Log → Analytics Update → Call Complete
-```
+1. **User** - User accounts & profiles
+2. **OAuthAccount** - OAuth integration
+3. **Session** - Session management
+4. **Credits** - Credit balance tracking
+5. **Call** - Call records
+6. **Transaction** - Financial transactions
+7. **Device** - Device management
+9. **Report** - User reports
+10. **ApiKey** - API key management
+10. **UserSettings** - User preferences
+11. **Analytics** - Platform metrics
+13. **Referral** - Referral system
+14. **Relationships** - All indexed & optimized
 
-### Authentication Flow
-```
-User Credentials → Hash & Compare → JWT Generation → Session Store
-    ↓
-Client Token Store → API Requests (Bearer Token) → Token Validation
-    ↓
-User Context → Protected Routes → Secure Operations
-```
+## 🔒 Security Measures
 
-## API Architecture
+- ✅ **HTTPS/TLS** - All traffic encrypted
+- ✅ **JWT Authentication** - Secure token-based auth
+- ✅ **Password Hashing** - bcrypt with 10 salt rounds
+- ✅ **Rate Limiting** - 100 requests/minute per IP
+- ✅ **CORS Protection** - Strict origin control
+- ✅ **CSRF Protection** - Token-based verification
+- ✅ **XSS Protection** - Input sanitization
+- ✅ **SQL Injection Prevention** - Parameterized queries
+- ✅ **Security Headers** - CSP, X-Frame-Options, etc.
+- ✅ **Session Management** - Secure session handling
+- ✅ **Device Fingerprinting** - Trusted devices tracking
 
-### Request/Response Pattern
-```
-GET /api/resource
-├── Authorization Check (JWT)
-├── Rate Limit Check
-├── Business Logic
-├── Database Query
-└── Response (JSON)
+## 🛠️ Development Workflow
 
-Response Format:
-{
-  "success": boolean,
-  "message": string (optional),
-  "data": T (optional),
-  "error": string (optional)
-}
-```
+1. **Local Development**: `npm run dev`
+2. **Database Setup**: `npm run db:push && npm run db:seed`
+3. **Testing**: `npm test`
+4. **Linting**: `npm run lint`
+5. **Type Checking**: `npm run typecheck`
 
-### Error Handling
-- 400: Bad Request (validation error)
-- 401: Unauthorized (auth failed)
-- 403: Forbidden (permission denied)
-- 404: Not Found (resource missing)
-- 429: Rate Limited (too many requests)
-- 500: Internal Server Error
+## 📦 Deployment
 
-## Database Schema
+- **Vercel**: For frontend deployment
+- **Railway** - For backend and database
+- **Docker** - Containerization for consistency
+- **CI/CD** - GitHub Actions workflow for automated testing and deployment
 
-### Key Tables
-- **Users** - User accounts and profiles
-- **Credits** - Credit balance management
-- **Calls** - Call records and history
-- **Transactions** - Financial transactions
-- **Devices** - Trusted devices
-- **Sessions** - Active sessions
-- **Reports** - User reports
-- **Analytics** - Platform metrics
+## 🔄 Data Flow
 
-### Relationships
-```
-User (1) ──→ (1) Credits
-User (1) ──→ (M) Calls
-User (1) ──→ (M) Transactions
-User (1) ──→ (M) Devices
-User (1) ──→ (M) Sessions
-User (1) ──→ (M) Reports
-```
+1. User interacts with UI → Next.js components
+2. API routes handle requests with authentication middleware
+3. Auth middleware verifies JWT tokens
+4. Prisma ORM queries database
+5. Twilio API for phone calls
+6. WebRTC for browser-to-browser calls
+7. Redis used for rate limiting and caching
+8. Responses returned to client
 
-## Caching Strategy
+## 📈 Scalability Features
 
-### Redis Cache Layers
-- **Session Cache** - Active user sessions
-- **Rate Limit Cache** - API request counts
-- **User Cache** - Frequently accessed user data
-- **Credit Cache** - Real-time credit balance
-- **Call Cache** - Recent call data
+- **Database Indexing** - All models have proper indexes
+- ✅ Connection Pooling - Optimized database connections
+- ✅ Redis Caching - Reduce database load
+- ✅ CDN Integration (Cloudflare) - Global content delivery
+- ✅ Load Balancing - Multiple instances behind load balancer
+- ✅ Horizontal Scaling - Add more instances as needed
 
-### Cache Invalidation
-- Time-based expiry (TTL)
-- Event-based invalidation
-- Manual cache clearing
+## 🔄 Continuous Integration/Continuous Deployment (CI/CD)
 
-## Security Architecture
+- GitHub Actions workflow for CI/CD
+- Automated linting and type checking
+- Automated testing
+- Build artifact creation
+- Deployment to Vercel and Railway
 
-### Authentication & Authorization
-- JWT tokens with expiration
-- Refresh token rotation
-- Role-based access control (RBAC)
-- Scope-based permissions
+## 📈 Monitoring & Observability
 
-### Data Protection
-- TLS/HTTPS encryption in transit
-- Database encryption at rest
-- Sensitive data masking
-- PII protection
+- Health checks endpoint (`/api/health`)
+- Error tracking and logging
+- Performance monitoring
+- Usage analytics
+- Alerting system for critical issues
 
-### API Security
-- Rate limiting per IP/user
-- CORS policy enforcement
-- CSRF token validation
-- Input sanitization
-- Output encoding
-
-### Monitoring & Logging
-- Request logging
-- Error tracking
-- Anomaly detection
-- Audit trails
-
-## Scalability Considerations
-
-### Horizontal Scaling
-- Stateless API design
-- Session store in Redis
-- Database connection pooling
-- Load balancing
-
-### Vertical Scaling
-- Efficient queries with indexes
-- Caching strategies
-- Connection pooling
-- Memory optimization
-
-### Database Optimization
-- Query indexing
-- Query optimization
-- Slow query monitoring
-- Replication setup
-
-## Deployment Architecture
-
-### Development
-```
-Local Machine
-├── Next.js Dev Server (port 3000)
-├── PostgreSQL (local)
-└── Redis (local)
-```
-
-### Staging
-```
-Staging Environment
-├── Next.js on Railway
-├── PostgreSQL on Railway
-└── Redis on Railway
-```
-
-### Production
-```
-Production Environment
-├── Frontend on Vercel
-├── Backend on Railway
-├── PostgreSQL on Railway (with backups)
-├── Redis on Railway
-└── CDN on Cloudflare
-```
-
-## Performance Metrics
-
-### Target KPIs
-- Page Load: < 2s
-- API Response: < 500ms
-- Database Query: < 100ms
-- Cache Hit Rate: > 80%
-- Uptime: 99.9%
-
-### Monitoring
-- Application Performance Monitoring (APM)
-- Error Rate Tracking
-- Database Performance
-- User Experience Metrics
-
-## Future Architecture Improvements
-
-- [ ] GraphQL API layer
-- [ ] Microservices architecture
-- [ ] Event-driven architecture
-- [ ] Machine learning for fraud detection
-- [ ] Real-time analytics pipeline
-- [ ] Mobile app architecture
+This architecture ensures that VoxPhantom can scale horizontally, maintain security, and provide an excellent user experience across all devices.

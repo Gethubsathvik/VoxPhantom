@@ -1,25 +1,29 @@
-// middleware/auth.ts
+// middleware.ts
 import { NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 
-export function withAuth(handler: Function) {
-  return async (req: Request, res: Response) => {
-    // Check for token in cookies
-    const token = req.cookies.get('token')?.value;
-    
+export function middleware(req: Request) {
+  const token = req.cookies.get('token')?.value;
+  
+  if (token && req.nextUrl.pathname.startsWith('/login')) {
+    // If user is already logged in, redirect to dashboard
+    return NextResponse.redirect(new URL('/', req.url));
+  }
+  
+  if (!token && req.nextUrl.pathname.startsWith('/dashboard')) {
+    // If not logged in, redirect to login
+    return NextResponse.redirect(new URL('/login', req.url));
+  }
+  
+  // For API routes, verify token
+  if (req.nextUrl.pathname.startsWith('/api/')) {
     if (!token) {
-      // For API routes, check if we're in an authenticated route
-      if (req.nextUrl.pathname.startsWith('/api/')) {
-        return NextResponse.json(
-          { success: false, error: 'Unauthorized' },
-          { status: 401 }
-        );
-      }
-      // For web routes, redirect to login
-      return NextResponse.redirect(new URL('/login', req.url));
+      return NextResponse.json(
+        { success: false, error: 'Unauthorized' },
+        { status: 401 }
+      );
     }
     
-    // Verify token
     const decoded = verifyToken(token);
     if (!decoded) {
       return NextResponse.json(
@@ -27,15 +31,13 @@ export function withAuth(handler: Function) {
         { status: 401 }
       );
     }
-    
-    // Attach user to request
-    (req as any).user = decoded;
-    
-    return handler(req, res);
-  };
+  }
+  
+  // Continue to next route
+  return next();
 }
 
-// Root middleware for security headers
+// Add security headers
 export function securityHeaders(req: Request, res: Response, next: Function) {
   const headers = new Headers(req.headers);
   
@@ -58,7 +60,7 @@ export function securityHeaders(req: Request, res: Response, next: Function) {
   // Add X-Content-Type-Options
   headers.set('X-Content-Type-Options', 'nosniff');
   
-  // Add X-XSS-Protection
+  // Add X-Frame-Options
   headers.set('X-XSS-Protection', '1; mode=block');
   
   next();
