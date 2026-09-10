@@ -54,21 +54,39 @@ A premium, production-ready browser-based VoIP calling platform built with Next.
 - ✅ Platform analytics
 - ✅ Call statistics & trends
 - ✅ Revenue tracking
-- ✅ User reports & abuse monitoring
-- ✅ System health monitoring
-- ✅ Admin controls
+- ✅ User reports
+- ✅ Abuse monitoring
 
-### 🎨 User Interface
-- ✅ Modern landing page
-- ✅ Futuristic dark mode design
-- ✅ Glassmorphism components
-- ✅ Neon gradient buttons
-- ✅ Smooth animations (Framer Motion)
-- ✅ Fully responsive design
-- ✅ Mobile-friendly dialpad
-- ✅ Real-time call interface
+## 🏗️ Architecture
 
-## 📦 Project Structure
+### Tech Stack
+
+**Frontend:**
+- Next.js 15 (React 19)
+- TypeScript
+- TailwindCSS
+- Framer Motion
+- Shadcn UI components
+- Lucide Icons
+
+**Backend:**
+- Node.js / Next.js API routes
+- Express.js (optional)
+- PostgreSQL
+- Prisma ORM
+- Redis (caching & rate limiting)
+
+**VoIP:**
+- Twilio Voice API
+- WebRTC (peer-to-peer)
+- SIP protocol
+
+**Deployment:**
+- Vercel (Frontend)
+- Railway (Backend/Database)
+- Cloudflare (CDN)
+
+### Project Structure
 
 ```
 VoxPhantom/
@@ -350,8 +368,9 @@ Perfect for learning:
 ## 🚀 Getting Started
 
 ```bash
-# 1. Navigate to project
-cd "d:/project's/projetc 1"
+git clone https://github.com/yourusername/voip-calling-app.git
+cd voip-calling-app
+```
 
 # 2. Install dependencies
 npm install
