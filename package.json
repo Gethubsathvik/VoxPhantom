@@ -32,11 +32,9 @@
     "zustand",
     "react-phone-number-input",
     "twilio",
-    "react-phone-number-input",
     "date-fns",
     "chart.js",
     "react-chartjs-2",
-    "date-fns",
     "pino",
     "pino-pretty",
     "helmet",
@@ -66,39 +64,6 @@
     "eslint",
     "eslint-config-next"
   },
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "db:push": "prisma db push",
-    "db:seed": "node prisma/seed.js",
-    "db:studio": "prisma studio",
-    "prisma:generate": "prisma generate",
-    "test": "jest"
-  },
   "keywords": [],
-  "main": "index.js",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "next test",
-    "db:push": "prisma db push",
-    "db:seed": "node prisma/seed.js",
-    "db:studio": "prisma studio"
-  },
-  "keywords": [],
-  "main": "index.js",
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "test": "next test"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "MIT"
+  "main": "index.js"
 }
