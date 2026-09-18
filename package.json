@@ -44,7 +44,8 @@
     "cors": "^2.8.5",
     "express-rate-limit": "^7.4.0",
     "dotenv": "^16.4.5",
-    "next-intl": "^3.20.0"
+    "next-intl": "^3.20.0",
+    "express": "^5.0.0"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
