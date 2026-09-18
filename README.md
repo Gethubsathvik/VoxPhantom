@@ -368,8 +368,8 @@ Perfect for learning:
 ## 🚀 Getting Started
 
 ```bash
-git clone https://github.com/yourusername/voip-calling-app.git
-cd voip-calling-app
+git clone https://github.com/Gethubsathvik/VoxPhantom.git
+cd VoxPhantom
 ```
 
 # 2. Install dependencies
