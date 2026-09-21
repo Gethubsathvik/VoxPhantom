@@ -6,12 +6,12 @@ export function sanitizeInput(input: any): any {
     // Remove HTML tags and special characters that could lead to XSS
     return input.replace(/<\/?[^>]+(>|$)/g, '').replace(/[&<>"']/g, (char) => {
       switch (char) {
-        case '&': return '&'
-        case '<': return '<'
-        case '>': return '>'
-        case '"': return '"'
-        case "'": return '''
-        default: return char
+        case '&': return '&amp;';
+        case '<': return '&lt;';
+        case '>': return '&gt;';
+        case '"': return '&quot;';
+        case "'": return '&#39;';
+        default: return char;
       }
     });
   }
@@ -21,7 +21,7 @@ export function sanitizeInput(input: any): any {
   }
   
   if (typeof input === 'object' && input !== null) {
-    const sanitized = {};
+    const sanitized: Record<string, any> = {};
     for (const [key, value] of Object.entries(input)) {
       sanitized[key] = sanitizeInput(value);
     }
@@ -45,7 +45,7 @@ export function createSanitizationMiddleware() {
         try {
           const parsedBody = JSON.parse(body);
           const sanitizedBody = sanitizeInput(parsedBody);
-          req.body = sanitizedBody;
+          (req as any).body = sanitizedBody;
         } catch (error) {
           // Invalid JSON, let it pass through to the route handler
         }
