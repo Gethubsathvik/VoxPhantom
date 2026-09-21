@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
         transcript: null,
         quality: null,
         startedAt: new Date(),
-        twilioSid: 'twilio-call-sid-'123',
+        twilioSid: 'twilio-call-sid-123',
       },
     });
     
