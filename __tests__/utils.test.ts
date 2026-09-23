@@ -1,4 +1,5 @@
 // __tests__/utils.test.ts
+/// <reference types="jest" />
 import { formatDuration, calculateCreditsNeeded, maskEmail } from '@/utils/helpers';
 import { validateEmail, validatePassword } from '@/utils/validators';
 

@@ -1,8 +1,8 @@
 // app/api/twilio/twiml/route.ts
-import { NextRequest, NextResponse } from 'next/server';
+import { NextResponse } from 'next/server';
 import { generateTwiML } from '@/lib/twilio';
 
-export async function POST(request: NextRequest) {
+export async function POST() {
   try {
     const twiml = generateTwiML('Thank you for calling. Your call has been connected.');
     

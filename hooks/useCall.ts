@@ -65,7 +65,7 @@ export function useCall() {
       // Send offer to server
       await axios.post(
         `/api/calls/${callId}/offer`,
-        { offer: offer.toJSON() },
+        { offer: { type: offer.type, sdp: offer.sdp } },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

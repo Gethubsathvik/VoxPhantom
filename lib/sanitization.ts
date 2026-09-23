@@ -1,9 +1,8 @@
 // Server input sanitization middleware
 import { NextRequest, NextResponse } from 'next/server';
 
-export function sanitizeInput(input: any): any {
+export function sanitizeInput(input: unknown): unknown {
   if (typeof input === 'string') {
-    // Remove HTML tags and special characters that could lead to XSS
     return input.replace(/<\/?[^>]+(>|$)/g, '').replace(/[&<>"']/g, (char) => {
       switch (char) {
         case '&': return '&amp;';
@@ -15,43 +14,37 @@ export function sanitizeInput(input: any): any {
       }
     });
   }
-  
+
   if (Array.isArray(input)) {
     return input.map(sanitizeInput);
   }
-  
+
   if (typeof input === 'object' && input !== null) {
-    const sanitized: Record<string, any> = {};
+    const sanitized: Record<string, unknown> = {};
     for (const [key, value] of Object.entries(input)) {
       sanitized[key] = sanitizeInput(value);
     }
     return sanitized;
   }
-  
+
   return input;
 }
 
 export function createSanitizationMiddleware() {
-  return (req: NextRequest, res: NextResponse, next: Function) => {
-    // Sanitize all request body data
+  return async (req: NextRequest, res: NextResponse, next: () => void) => {
     if (req.method === 'POST' || req.method === 'PUT' || req.method === 'PATCH') {
-      let body = '';
-      
-      req.on('data', (chunk) => {
-        body += chunk.toString();
-      });
-      
-      req.on('end', () => {
+      const contentType = req.headers.get('content-type');
+      if (contentType && contentType.includes('application/json')) {
         try {
-          const parsedBody = JSON.parse(body);
-          const sanitizedBody = sanitizeInput(parsedBody);
-          (req as any).body = sanitizedBody;
-        } catch (error) {
+          const body = await req.json();
+          const sanitizedBody = sanitizeInput(body);
+          (req as { body?: unknown }).body = sanitizedBody;
+        } catch {
           // Invalid JSON, let it pass through to the route handler
         }
-      });
+      }
     }
-    
+
     next();
   };
 }

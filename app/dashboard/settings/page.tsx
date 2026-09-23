@@ -6,11 +6,11 @@ import { useAuth } from '@/hooks/useAuth';
 import { Card } from '@/components/Card';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
-import { Link as LinkIcon, Shield, Bell } from 'lucide-react';
+import { Shield, Bell } from 'lucide-react';
 import Link from 'next/link';
 
 export default function SettingsPage() {
-  const { user, logout } = useAuth();
+  const { user } = useAuth();
   const [settings, setSettings] = useState({
     emailNotifications: true,
     callRecording: false,

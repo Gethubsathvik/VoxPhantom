@@ -1,29 +1,15 @@
-// components/Navbar.tsx - Updated to show VoxPhantom branding
-import { View, Text, StyleSheet } from 'react-native';
+// components/Navbar.tsx
+import Link from 'next/link';
+import { Phone } from 'lucide-react';
 
 export default function Navbar() {
   return (
-    <View style={styles.navbar}>
-      <Text style={styles.logo}>VoxPhantom</Text>
-      <Text style={styles.subtitle}>Make free international calls</Text>
-    </View>
+    <nav className="flex items-center justify-between px-4 py-3 bg-dark-900 border-b border-gray-800">
+      <Link href="/" className="flex items-center space-x-2 text-white">
+        <Phone className="w-6 h-6 text-blue-400" />
+        <span className="font-bold text-lg">VoxPhantom</span>
+      </Link>
+      <p className="text-sm text-gray-400">Make free international calls</p>
+    </nav>
   );
 }
-
-const styles = StyleSheet.create({
-  navbar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    backgroundColor: '#000',
-  },
-  logo: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-  },
-  subtitle: {
-    fontSize: 12,
-    color: '#ccc',
-  },
-});

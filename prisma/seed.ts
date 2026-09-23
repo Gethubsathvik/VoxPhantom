@@ -1,4 +1,4 @@
-// prisma/seed.ts - Updated to show VoxPhantom branding
+// prisma/seed.ts
 import { PrismaClient } from '@prisma/client';
 import { faker } from '@faker-js/faker';
 
@@ -11,10 +11,10 @@ async function main() {
   const sampleUsers = Array.from({ length: 10 }).map(() => ({
     email: faker.internet.email(),
     password: faker.internet.password(),
-    firstName: faker.name.firstName(),
-    lastName: faker.name.lastName(),
+    firstName: faker.person.firstName(),
+    lastName: faker.person.lastName(),
     phone: faker.phone.number(),
-    country: faker.address.country,
+    country: faker.location.country(),
     verified: faker.datatype.boolean(),
     createdAt: new Date(),
     updatedAt: new Date(),
@@ -25,7 +25,7 @@ async function main() {
     await prisma.user.create({
       data: {
         email: userData.email,
-        password: await prisma.$executeRaw`SELECT bcrypt.hash(${userData.password}, 10)`,
+        password: userData.password,
         firstName: userData.firstName,
         lastName: userData.lastName,
         phone: userData.phone,

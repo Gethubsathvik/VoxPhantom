@@ -1,9 +1,9 @@
 // middleware/auth.ts
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { verifyToken } from '@/lib/auth';
 
 export function withAuth(handler: Function) {
-  return async (req: Request, res: Response) => {
+  return async (req: NextRequest, res: Response) => {
     // Check for token in cookies
     const token = req.cookies.get('token')?.value;
     
@@ -36,7 +36,7 @@ export function withAuth(handler: Function) {
 }
 
 // Root middleware for security headers
-export function securityHeaders(req: Request, res: Response, next: Function) {
+export function securityHeaders(req: NextRequest, res: Response, next: Function) {
   const headers = new Headers(req.headers);
   
   // Add security headers

@@ -1,30 +1,11 @@
-// app/page.tsx - Updated to show VoxPhantom branding
-import { View, Text, StyleSheet } from 'react-native';
-import { View, Text, StyleSheet } from 'react-native';
-
+// app/page.tsx
 export default function Page() {
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>VoxPhantom</Text>
-      <Text style={styles.subtitle}>Make free international calls</Text>
-    </View>
+    <div className="min-h-screen bg-dark-900 flex items-center justify-center">
+      <div className="text-center space-y-4">
+        <h1 className="text-4xl font-bold text-white">VoxPhantom</h1>
+        <p className="text-gray-400 text-xl">Make free international calls</p>
+      </div>
+    </div>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    padding: 20,
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  subtitle: {
-    fontSize: 16,
-    marginBottom: 20,
-    textAlign: 'center',
-  }
-});

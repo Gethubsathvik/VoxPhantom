@@ -20,7 +20,7 @@ interface AnalyticsChartProps {
   type: 'line' | 'bar' | 'pie';
 }
 
-export const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data, type }) => {
+export const AnalyticsChart: React.FC<AnalyticsChartProps> = ({ title, data }) => {
   return (
     <Card glass>
       <div className="space-y-6">

@@ -57,7 +57,7 @@ export default function AdminPage() {
       <div className="min-h-screen bg-dark-900 flex items-center justify-center">
         <Card glass className="text-center space-y-4">
           <p className="text-red-400 font-semibold">Access Denied</p>
-          <p className="text-gray-400">You don't have permission to access this page</p>
+          <p className="text-gray-400">You don&apos;t have permission to access this page</p>
           <Link href="/dashboard">
             <Button>Back to Dashboard</Button>
           </Link>

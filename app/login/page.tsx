@@ -21,8 +21,12 @@ export default function LoginPage() {
     
     try {
       await login(email, password);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Login failed');
+    } catch (err) {
+      setError(
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response: { data: { error?: string } } }).response?.data?.error || 'Login failed'
+          : 'Login failed'
+      );
     }
   };
 
@@ -84,7 +88,7 @@ export default function LoginPage() {
           </div>
 
           <p className="text-center text-gray-400">
-            Don't have an account?{' '}
+            Don&apos;t have an account?{' '}
             <Link href="/register" className="text-blue-400 hover:text-blue-300">
               Sign up for free
             </Link>

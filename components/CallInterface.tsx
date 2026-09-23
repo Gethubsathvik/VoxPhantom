@@ -2,7 +2,7 @@
 'use client';
 
 import React from 'react';
-import { Phone, Mic, MicOff, Volume2, RotateCcw } from 'lucide-react';
+import { Phone, Mic, MicOff, Volume2 } from 'lucide-react';
 import { Button } from './Button';
 import { Card } from './Card';
 

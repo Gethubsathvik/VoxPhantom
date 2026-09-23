@@ -3,7 +3,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
 import { sanitizeInput } from '@/lib/sanitization';
 import { z } from 'zod';
-import { MESSAGES } from '@/utils/constants';
 
 // Define schema for call initiation
 const CallInitiateSchema = z.object({
@@ -39,36 +38,24 @@ export async function POST(request: NextRequest) {
       );
     }
     
-    // Look up country cost
-    const countryData = await db.countries.findUnique({
-      where: { name: country || 'United States' }
-    });
-    
-    if (!countryData) {
-      return NextResponse.json(
-        { success: false, error: 'Invalid country' },
-        { status: 400 }
-      );
-    }
-    
     // Check credit balance
     const credits = await db.credits.findUnique({
       where: { userId: user.id }
     });
     
-    if (credits?.balance <= 0) {
+    // Calculate cost
+    const costPerMinute = 0.01;
+    const duration = 300; // 5 minutes example
+    const creditsNeeded = Math.ceil((duration / 60) * costPerMinute);
+    
+    if (credits && credits.balance <= 0) {
       return NextResponse.json(
         { success: false, error: 'Insufficient credits' },
         { status: 400 }
       );
     }
     
-    // Calculate cost
-    const costPerMinute = countryData.costPerMinute;
-    const duration = 300; // 5 minutes example
-    const creditsNeeded = Math.ceil((duration / 60) * costPerMinute);
-    
-    if (credits.balance < creditsNeeded) {
+    if (credits && credits.balance < creditsNeeded) {
       return NextResponse.json(
         { success: false, error: 'Insufficient credits' },
         { status: 400 }
@@ -96,7 +83,7 @@ export async function POST(request: NextRequest) {
     await db.credits.update({
       where: { userId: user.id },
       data: {
-        balance: credits.balance - creditsNeeded,
+        balance: credits!.balance - creditsNeeded,
       },
     });
     
@@ -107,7 +94,7 @@ export async function POST(request: NextRequest) {
           callId: call.id,
           costPerMinute,
           creditsUsed: creditsNeeded,
-          newBalance: credits.balance - creditsNeeded,
+          newBalance: credits!.balance - creditsNeeded,
         },
       },
       { status: 201 }

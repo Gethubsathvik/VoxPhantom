@@ -4,10 +4,9 @@ import { incrementCounter } from '@/lib/redis';
 
 export async function rateLimit(request: NextRequest, limit: number = 100, window: number = 60) {
   const ip = request.headers.get('x-forwarded-for') || request.headers.get('x-real-ip') || 'unknown';
-  const key = `rate-limit:${ip}`;
 
   try {
-    const count = await incrementCounter(key, window);
+    const count = await incrementCounter(`rate-limit:${ip}`, window);
     if (count > limit) {
       return NextResponse.json(
         { success: false, error: 'Rate limit exceeded' },

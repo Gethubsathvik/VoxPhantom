@@ -3,7 +3,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { Mail, Lock, User, ArrowLeft } from 'lucide-react';
+import { Mail, Lock, ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Card } from '@/components/Card';
@@ -28,8 +28,12 @@ export default function RegisterPage() {
 
     try {
       await register(email, password, firstName, lastName);
-    } catch (err: any) {
-      setError(err.response?.data?.error || 'Registration failed');
+    } catch (err) {
+      setError(
+        err && typeof err === 'object' && 'response' in err
+          ? (err as { response: { data: { error?: string } } }).response?.data?.error || 'Registration failed'
+          : 'Registration failed'
+      );
     }
   };
 

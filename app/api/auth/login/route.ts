@@ -1,10 +1,8 @@
 // app/api/auth/login/route.ts
 import { NextRequest, NextResponse } from 'next/server';
 import { db } from '@/lib/db';
-import { comparePassword, createToken, createRefreshToken } from '@/lib/auth';
 import { LoginSchema } from '@/lib/validation';
 import { rateLimitLogin } from '@/lib/rateLimiter';
-import { MESSAGES } from '@/utils/constants';
 import { sanitizeInput } from '@/lib/sanitization';
 import { Auth0Service } from '@/lib/auth0';
 
@@ -48,7 +46,6 @@ export async function POST(request: NextRequest) {
     const response = NextResponse.json(
       {
         success: true,
-        message: MESSAGES.SUCCESS.LOGIN,
         data: {
           user: {
             id: user?.id || 'unknown',
@@ -70,7 +67,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
     
     response.cookies.set('refreshToken', refreshToken, {
@@ -78,7 +75,7 @@ export async function POST(request: NextRequest) {
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/auth/refresh',
-      maxAge: 60 * 60 * 24 * 30, // 30 days
+      maxAge: 60 * 60 * 24 * 30,
     });
     
     return response;
